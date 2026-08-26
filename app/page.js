@@ -53,8 +53,27 @@ export default function Home() {
   }
 
   useEffect(() => {
-    loadData();
-  }, []);
+  loadData();
+
+  const channel = supabase
+    .channel("learning_records_changes")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "learning_records",
+      },
+      () => {
+        loadData();
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
 
   async function saveRecord(day, status, note) {
     setSavingDay(day);
