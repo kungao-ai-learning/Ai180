@@ -3,13 +3,637 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://sbcgcxljgceziohhytuw.supabase.co";
-const supabaseKey = "sb_publishable_CSFpH1N5_WVloTnvNhArPQ_9Kh-JCuj";
+const supabaseUrl =
+  "https://sbcgcxljgceziohhytuw.supabase.co";
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseKey =
+  "sb_publishable_CSFpH1N5_WVloTnvNhArPQ_9Kh-JCuj";
+
+const supabase = createClient(
+  supabaseUrl,
+  supabaseKey
+);
 
 export default function Home() {
+
   const [tasks, setTasks] = useState([]);
+  const [records, setRecords] = useState({});
+  const [savingDay, setSavingDay] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
+
+
+  // =========================
+  // 加载数据
+  // =========================
+
+  async function loadData() {
+
+    const {
+      data: taskData,
+      error: taskError
+    } = await supabase
+      .from("learning_tasks")
+      .select("*")
+      .order("day");
+
+
+    if (taskError) {
+      console.error(
+        "读取学习计划失败:",
+        taskError
+      );
+      return;
+    }
+
+
+    const {
+      data: recordData,
+      error: recordError
+    } = await supabase
+      .from("learning_records")
+      .select("*")
+      .order("day");
+
+
+    if (recordError) {
+      console.error(
+        "读取学习记录失败:",
+        recordError
+      );
+      return;
+    }
+
+
+    const recordMap = {};
+
+
+    (recordData || []).forEach(
+      (item) => {
+        recordMap[item.day] = item;
+      }
+    );
+
+
+    setTasks(taskData || []);
+    setRecords(recordMap);
+
+    setLoading(false);
+  }
+
+
+
+  // =========================
+  // 初始化 + Realtime
+  // =========================
+
+  useEffect(() => {
+
+
+    loadData();
+
+
+
+    const channel =
+      supabase
+        .channel(
+          "learning_records_changes"
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "learning_records",
+          },
+          () => {
+
+            loadData();
+
+          }
+        )
+        .subscribe();
+
+
+
+    return () => {
+
+      supabase.removeChannel(
+        channel
+      );
+
+    };
+
+
+  }, []);
+
+
+
+
+  // =========================
+  // 保存学习记录
+  // =========================
+
+  async function saveRecord(
+    day,
+    status,
+    note
+  ) {
+
+
+    setSavingDay(day);
+
+
+
+    const {
+      data,
+      error
+    } = await supabase
+      .from("learning_records")
+      .upsert(
+        {
+          day: day,
+          status: status,
+          learning_note:
+            note || "",
+          result_note:
+            "",
+          updated_at:
+            new Date()
+              .toISOString(),
+        },
+        {
+          onConflict:
+            "day",
+        }
+      )
+      .select()
+      .single();
+
+
+
+    if (error) {
+
+      console.error(
+        "保存失败:",
+        error
+      );
+
+      alert(
+        "保存失败：" +
+        error.message
+      );
+
+      setSavingDay(null);
+
+      return;
+    }
+
+
+
+    setRecords(
+      (old) => ({
+        ...old,
+        [day]: data,
+      })
+    );
+
+
+    setSavingDay(null);
+
+  }
+
+
+
+
+  // =========================
+  // 修改笔记
+  // =========================
+
+  function updateNote(
+    day,
+    note
+  ) {
+
+    setRecords(
+      (old) => ({
+        ...old,
+
+        [day]: {
+
+          ...(old[day] || {}),
+
+          day: day,
+
+          status:
+            old[day]?.status ||
+            "in_progress",
+
+          learning_note:
+            note,
+
+        },
+      })
+    );
+
+  }
+
+
+
+  // =========================
+  // 数据统计
+  // =========================
+
+
+  const completedCount =
+    Object.values(records)
+      .filter(
+        (item) =>
+          item.status ===
+          "completed"
+      )
+      .length;
+
+
+
+  const progressPercent =
+    Math.round(
+      completedCount /
+      180 *
+      100
+    );
+
+
+
+  const nextDay =
+    Math.min(
+      completedCount + 1,
+      180
+    );
+
+
+
+  const todayTask =
+    tasks.find(
+      (task) =>
+        task.day === nextDay
+    )
+    ||
+    tasks[0];
+
+
+
+  if (loading) {
+
+    return (
+      <div
+        style={{
+          padding:"50px",
+          textAlign:"center"
+        }}
+      >
+        Ai180 加载中...
+      </div>
+    );
+
+  }
+  return (
+
+    <main
+      style={{
+        maxWidth:"900px",
+        margin:"0 auto",
+        padding:"25px 18px 60px",
+        background:"#f7f8fa",
+        minHeight:"100vh",
+        fontFamily:
+        '-apple-system,BlinkMacSystemFont,"Segoe UI",Arial'
+      }}
+    >
+
+
+      {/* 标题 */}
+
+      <h1>
+        Ai180 AI职业转型计划
+      </h1>
+
+
+      <p
+        style={{
+          color:"#666"
+        }}
+      >
+        我的180天AI能力成长路线
+      </p >
+
+
+
+      {/* 数据面板 */}
+
+      <div
+        style={{
+          background:"#111827",
+          color:"white",
+          padding:"22px",
+          borderRadius:"16px",
+          marginTop:"20px"
+        }}
+      >
+
+        <div>
+          当前进度
+        </div>
+
+
+        <div
+          style={{
+            fontSize:"32px",
+            fontWeight:"700"
+          }}
+        >
+          {completedCount}
+          /
+          180 天
+        </div>
+
+
+        <div
+          style={{
+            marginTop:"8px",
+            opacity:.8
+          }}
+        >
+
+          完成率：
+          {progressPercent}%
+
+
+        </div>
+
+
+      </div>
+
+
+
+
+
+      {/* 今日任务 */}
+
+      {todayTask && (
+
+      <div
+        style={{
+          background:"white",
+          marginTop:"22px",
+          padding:"22px",
+          borderRadius:"16px",
+          border:"2px solid #111827"
+        }}
+      >
+
+
+        <div
+          style={{
+            color:"#666"
+          }}
+        >
+          今日学习
+        </div>
+
+
+
+        <h2>
+          Day {todayTask.day}
+        </h2>
+
+
+
+        <h3>
+          {todayTask.title}
+        </h3>
+
+
+
+        <div
+          style={{
+            marginTop:"10px",
+            color:"#444",
+            lineHeight:"1.7"
+          }}
+        >
+
+          {todayTask.learn_content}
+
+        </div>
+
+
+
+        <h4>
+          今日行动
+        </h4>
+
+
+        <div
+          style={{
+            color:"#444",
+            lineHeight:"1.7"
+          }}
+        >
+
+          {todayTask.action_content ||
+          "完成今天学习任务"}
+
+        </div>
+
+
+
+        <textarea
+
+          value={
+            records[todayTask.day]
+            ?.learning_note
+            ||
+            ""
+          }
+
+
+          onChange={
+            (e)=>
+            updateNote(
+              todayTask.day,
+              e.target.value
+            )
+          }
+
+
+          placeholder="记录今天学习心得..."
+
+          style={{
+            width:"100%",
+            minHeight:"100px",
+            marginTop:"18px",
+            padding:"12px",
+            borderRadius:"10px",
+            border:"1px solid #ddd"
+          }}
+
+        />
+
+
+
+        <button
+
+          onClick={()=>
+
+            saveRecord(
+
+              todayTask.day,
+
+              records[todayTask.day]
+              ?.status === "completed"
+              ?
+              "in_progress"
+              :
+              "completed",
+
+              records[todayTask.day]
+              ?.learning_note
+              ||
+              ""
+
+            )
+
+          }
+
+
+          disabled={
+            savingDay===todayTask.day
+          }
+
+
+          style={{
+            marginTop:"15px",
+            padding:"12px 25px",
+            borderRadius:"10px",
+            border:"none",
+            background:"#111827",
+            color:"white",
+            fontSize:"15px"
+          }}
+
+        >
+
+        {
+          savingDay===todayTask.day
+          ?
+          "保存中..."
+          :
+          "完成今日学习"
+        }
+
+
+        </button>
+
+
+      </div>
+
+      )}
+
+
+
+
+
+
+      {/* 历史记录 */}
+
+      <button
+
+        onClick={()=>
+          setShowHistory(
+            !showHistory
+          )
+        }
+
+        style={{
+          width:"100%",
+          marginTop:"25px",
+          padding:"15px",
+          background:"white",
+          border:"1px solid #ddd",
+          borderRadius:"12px",
+          fontSize:"15px"
+        }}
+
+      >
+
+      {
+        showHistory
+        ?
+        "收起历史记录 ▲"
+        :
+        "查看历史记录 ▼"
+      }
+
+
+      </button>
+
+
+
+
+
+
+      {
+        showHistory &&
+
+        tasks.map(
+
+          (task)=>(
+
+          <div
+
+            key={task.day}
+
+            style={{
+              background:"white",
+              marginTop:"10px",
+              padding:"15px",
+              borderRadius:"12px"
+            }}
+
+          >
+
+            Day {task.day}
+
+            {" · "}
+
+            {task.title}
+
+
+            {
+              records[task.day]
+              ?.status==="completed"
+              &&
+              " ✓"
+            }
+
+
+          </div>
+
+          )
+
+        )
+
+      }
+
+
+
+    </main>
+
+  );
+
+}
+const [tasks, setTasks] = useState([]);
   const [records, setRecords] = useState({});
   const [savingDay, setSavingDay] = useState(null);
   const [loading, setLoading] = useState(true);
