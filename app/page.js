@@ -54,13 +54,6 @@ export default function Home() {
 
   useEffect(() => {
     loadData();
-
-    // 每5秒自动同步一次
-    const timer = setInterval(() => {
-      loadData();
-    }, 5000);
-
-    return () => clearInterval(timer);
   }, []);
 
   async function saveRecord(day, status, note) {
