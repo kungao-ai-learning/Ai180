@@ -10,10 +10,13 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Home() {
   const [tasks, setTasks] = useState([]);
-  const [progress, setProgress] = useState({});
+  const [records, setRecords] = useState({});
   const [savingDay, setSavingDay] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   async function loadData() {
+    setLoading(true);
+
     const { data: taskData, error: taskError } = await supabase
       .from("learning_tasks")
       .select("*")
@@ -21,27 +24,32 @@ export default function Home() {
 
     if (taskError) {
       console.error("读取学习计划失败:", taskError);
+      alert("读取学习计划失败：" + taskError.message);
+      setLoading(false);
       return;
     }
 
-    const { data: progressData, error: progressError } = await supabase
-      .from("learning_progress")
+    const { data: recordData, error: recordError } = await supabase
+      .from("learning_records")
       .select("*")
       .order("day");
 
-    if (progressError) {
-      console.error("读取学习进度失败:", progressError);
+    if (recordError) {
+      console.error("读取学习记录失败:", recordError);
+      alert("读取学习记录失败：" + recordError.message);
+      setLoading(false);
       return;
     }
 
-    const progressMap = {};
+    const recordMap = {};
 
-    (progressData || []).forEach((item) => {
-      progressMap[item.day] = item;
+    (recordData || []).forEach((item) => {
+      recordMap[item.day] = item;
     });
 
     setTasks(taskData || []);
-    setProgress(progressMap);
+    setRecords(recordMap);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -55,59 +63,74 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  async function saveProgress(day, status, note) {
+  async function saveRecord(day, status, note) {
     setSavingDay(day);
 
-    const { error } = await supabase
-      .from("learning_progress")
+    const { data, error } = await supabase
+      .from("learning_records")
       .upsert(
         {
-          day,
-          status,
-          note,
+          day: day,
+          status: status,
+          learning_note: note || "",
+          result_note: "",
           updated_at: new Date().toISOString(),
         },
         {
           onConflict: "day",
         }
-      );
+      )
+      .select()
+      .single();
 
     if (error) {
       console.error("保存失败:", error);
       alert("保存失败：" + error.message);
-    } else {
-      setProgress((old) => ({
-        ...old,
-        [day]: {
-          ...(old[day] || {}),
-          day,
-          status,
-          note,
-          updated_at: new Date().toISOString(),
-        },
-      }));
+      setSavingDay(null);
+      return;
     }
+
+    setRecords((old) => ({
+      ...old,
+      [day]: data,
+    }));
 
     setSavingDay(null);
   }
 
   function updateNote(day, note) {
-    setProgress((old) => ({
+    setRecords((old) => ({
       ...old,
       [day]: {
         ...(old[day] || {}),
-        day,
-        status: old[day]?.status || "未完成",
-        note,
+        day: day,
+        status: old[day]?.status || "in_progress",
+        learning_note: note,
       },
     }));
   }
 
-  const completedCount = Object.values(progress).filter(
-    (item) => item.status === "已完成"
+  const completedCount = Object.values(records).filter(
+    (item) => item.status === "completed" || item.status === "已完成"
   ).length;
 
-  const nextDay = completedCount + 1;
+  const nextDay = Math.min(completedCount + 1, 180);
+
+  if (loading) {
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "Arial, sans-serif",
+        }}
+      >
+        正在加载 Ai180……
+      </main>
+    );
+  }
 
   return (
     <main
@@ -129,6 +152,7 @@ export default function Home() {
         我的180天学习计划
       </p >
 
+      {/* 当前进度 */}
       <div
         style={{
           background: "#111827",
@@ -142,18 +166,28 @@ export default function Home() {
           当前进度
         </div>
 
-        <div style={{ fontSize: "30px", fontWeight: "700", marginTop: "5px" }}>
+        <div
+          style={{
+            fontSize: "30px",
+            fontWeight: "700",
+            marginTop: "5px",
+          }}
+        >
           {completedCount} / 180 天
         </div>
 
         <div style={{ marginTop: "8px", opacity: 0.8 }}>
-          下一步：Day {nextDay <= 180 ? nextDay : 180}
+          下一步：Day {nextDay}
         </div>
       </div>
 
+      {/* 学习任务 */}
       {tasks.map((task) => {
-        const item = progress[task.day] || {};
-        const completed = item.status === "已完成";
+        const record = records[task.day] || {};
+
+        const completed =
+          record.status === "completed" ||
+          record.status === "已完成";
 
         return (
           <div
@@ -169,6 +203,7 @@ export default function Home() {
               boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}
           >
+            {/* 标题 */}
             <div
               style={{
                 display: "flex",
@@ -188,7 +223,12 @@ export default function Home() {
                   Day {task.day}
                 </div>
 
-                <h2 style={{ margin: 0, fontSize: "20px" }}>
+                <h2
+                  style={{
+                    margin: 0,
+                    fontSize: "20px",
+                  }}
+                >
                   {task.title}
                 </h2>
               </div>
@@ -205,6 +245,7 @@ export default function Home() {
               </div>
             </div>
 
+            {/* 学习内容 */}
             <div
               style={{
                 marginTop: "15px",
@@ -212,12 +253,15 @@ export default function Home() {
                 color: "#444",
               }}
             >
-              {task.learn_content || task.learn_content || "暂无学习内容"}
+              {task.learn_content || "暂无学习内容"}
             </div>
 
+            {/* 学习笔记 */}
             <textarea
-              value={item.note || ""}
-              onChange={(e) => updateNote(task.day, e.target.value)}
+              value={record.learning_note || ""}
+              onChange={(e) =>
+                updateNote(task.day, e.target.value)
+              }
               placeholder="记录今天的学习心得、问题、收获……"
               style={{
                 width: "100%",
@@ -232,6 +276,7 @@ export default function Home() {
               }}
             />
 
+            {/* 操作按钮 */}
             <div
               style={{
                 display: "flex",
@@ -241,10 +286,10 @@ export default function Home() {
             >
               <button
                 onClick={() =>
-                  saveProgress(
+                  saveRecord(
                     task.day,
-                    completed ? "未完成" : "已完成",
-                    item.note || ""
+                    completed ? "in_progress" : "completed",
+                    record.learning_note || ""
                   )
                 }
                 disabled={savingDay === task.day}
@@ -267,10 +312,10 @@ export default function Home() {
 
               <button
                 onClick={() =>
-                  saveProgress(
+                  saveRecord(
                     task.day,
-                    item.status || "未完成",
-                    item.note || ""
+                    record.status || "in_progress",
+                    record.learning_note || ""
                   )
                 }
                 disabled={savingDay === task.day}
