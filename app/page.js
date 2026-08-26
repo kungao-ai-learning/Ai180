@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = "https://sbcgcxljgceziohhytuw.supabase.co";
-const supabaseKey = "sb_publishable_CSFpHN1S_WIoTnVnNhArPQ_9Kh-JCuj";
+const supabaseKey = "sb_publishable_CSFpH1N5_WVloTnvNhArPQ_9Kh-JCuj";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
