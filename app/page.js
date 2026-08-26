@@ -746,14 +746,35 @@ const [tasks, setTasks] = useState([]);
     }));
   }
 
-  const completedCount = Object.values(records).filter(
-    (item) => item.status === "completed" || item.status === "已完成"
-  ).length;
+  const completedCount =
+  Object.values(records)
+    .filter(
+      (item) =>
+        item.status === "completed"
+    )
+    .length;
 
-  const nextDay = Math.min(completedCount + 1, 180);
+
+const progressPercent =
+  Math.round(
+    completedCount / 180 * 100
+  );
+
+
+const nextDay =
+  Math.min(
+    completedCount + 1,
+    180
+  );
+
 
 const todayTask =
-  tasks.find((task) => task.day === nextDay) || tasks[0];
+  tasks.find(
+    (task) =>
+      task.day === nextDay
+  )
+  ||
+  tasks[0];
 
   if (loading) {
     return (
