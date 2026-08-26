@@ -128,6 +128,9 @@ export default function Home() {
 
   const nextDay = Math.min(completedCount + 1, 180);
 
+const todayTask =
+  tasks.find((task) => task.day === nextDay) || tasks[0];
+
   if (loading) {
     return (
       <main
@@ -191,7 +194,54 @@ export default function Home() {
         <div style={{ marginTop: "8px", opacity: 0.8 }}>
           下一步：Day {nextDay}
         </div>
-      </div>
+      </div>{/* 今日任务 */}
+{todayTask && (
+  <div
+    style={{
+      background: "white",
+      borderRadius: "14px",
+      padding: "22px",
+      marginBottom: "25px",
+      border: "2px solid #111827",
+    }}
+  >
+    <div
+      style={{
+        color: "#666",
+        fontSize: "14px",
+      }}
+    >
+      今日学习
+    </div>
+
+    <h2
+      style={{
+        marginTop: "8px",
+      }}
+    >
+      Day {todayTask.day} · {todayTask.title}
+    </h2>
+
+    <p
+      style={{
+        lineHeight: 1.7,
+        color: "#444",
+      }}
+    >
+      {todayTask.learn_content}
+    </p >
+
+    <div
+      style={{
+        marginTop: "15px",
+        color: "#16a34a",
+        fontWeight: "600",
+      }}
+    >
+      当前目标：完成今天学习
+    </div>
+  </div>
+)}
 
       {/* 学习任务 */}
       {tasks.map((task) => {
