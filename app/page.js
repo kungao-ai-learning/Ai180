@@ -467,6 +467,23 @@ const remainingDays =
     )
     ||
     tasks[0];
+  useEffect(()=>{
+
+  if(todayTask){
+
+    setAiSummary(
+      records[todayTask.day]
+      ?.ai_summary
+      ||
+      ""
+    );
+
+  }
+
+},[
+  todayTask,
+  records
+]);
 
 const currentPhase =
   todayTask?.phase ||
