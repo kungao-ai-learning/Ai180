@@ -1309,7 +1309,56 @@ boxSizing:"border-box"
       }
 
 
+async function generateGrowthReport(){
 
+  setReportLoading(true);
+
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/growth-report",
+        {
+          method:"POST"
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "生成失败"
+      );
+
+    }
+
+
+    setGrowthReport(
+      data.report || ""
+    );
+
+
+  }catch(error){
+
+    alert(
+      "生成失败：" +
+      error.message
+    );
+
+
+  }finally{
+
+    setReportLoading(false);
+
+  }
+
+}
 
 
 
