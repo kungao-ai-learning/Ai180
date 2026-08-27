@@ -620,8 +620,26 @@ export default function Home() {
 
 
       const response =
-        await fetch(
-          "/api/growth-report",
+await fetch(
+"/api/growth-report",
+{
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:JSON.stringify({
+
+tasks:tasks,
+
+records:records
+
+})
+
+}
+);
           {
 
             method:
