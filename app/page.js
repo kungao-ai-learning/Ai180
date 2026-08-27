@@ -242,7 +242,30 @@ export default function Home() {
       setAiSummary(
         data.summary || ""
       );
+await supabase
+.from("learning_records")
+.upsert(
+{
+  day: todayTask.day,
 
+  learning_note:
+    learningNote,
+
+  result_note:
+    resultNote,
+
+  ai_summary:
+    data.summary || "",
+
+  updated_at:
+    new Date().toISOString()
+
+},
+{
+  onConflict:
+    "day"
+}
+);
     } catch (error) {
 
       console.error(
