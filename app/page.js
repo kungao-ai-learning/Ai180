@@ -446,7 +446,22 @@ result_note:
 
 const remainingDays =
   180 - completedCount;
+const aiSummaryCount =
+  Object.values(records)
+  .filter(
+    item =>
+    item.ai_summary
+  )
+  .length;
 
+
+const resultCount =
+  Object.values(records)
+  .filter(
+    item =>
+    item.result_note
+  )
+  .length;
 
 
 
@@ -587,9 +602,65 @@ fontWeight:"700"
 
 </div>
 
+<div
+style={{
+background:"white",
+padding:"18px",
+borderRadius:"16px"
+}}
+>
+
+<div
+style={{
+color:"#666",
+fontSize:"13px"
+}}
+>
+🤖 AI总结
+</div>
 
 
+<div
+style={{
+fontSize:"28px",
+fontWeight:"700"
+}}
+>
+{aiSummaryCount}
+篇
+</div>
 
+</div>
+
+<div
+style={{
+background:"white",
+padding:"18px",
+borderRadius:"16px"
+}}
+>
+
+<div
+style={{
+color:"#666",
+fontSize:"13px"
+}}
+>
+🚀 成果输出
+</div>
+
+
+<div
+style={{
+fontSize:"28px",
+fontWeight:"700"
+}}
+>
+{resultCount}
+项
+</div>
+
+</div>
 
 <div
 style={{
