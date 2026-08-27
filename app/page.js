@@ -463,7 +463,15 @@ const resultCount =
   )
   .length;
 
-
+const phaseList =
+[
+  ...new Set(
+    tasks.map(
+      item =>
+      item.phase
+    )
+  )
+];
 
 
 
@@ -871,7 +879,42 @@ marginBottom:"12px"
 {currentPhase}
 </div>
 
+<div
+style={{
+marginTop:"15px",
+background:"white",
+padding:"15px",
+borderRadius:"12px"
+}}
+>
 
+<h4>
+🗺️ AI成长阶段
+</h4>
+
+
+{
+phaseList.map(
+phase => (
+
+<div
+key={phase}
+style={{
+padding:"8px 0",
+borderBottom:"1px solid #eee"
+}}
+>
+
+{phase}
+
+</div>
+
+)
+)
+}
+
+
+</div>
 
           <p
             style={{
