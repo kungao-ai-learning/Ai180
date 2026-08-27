@@ -31,7 +31,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const [showHistory, setShowHistory] = useState(false);
+  
+  const [aiSummary, setAiSummary] = useState("");
 
+  const [aiLoading, setAiLoading] = useState(false);
 
 
   // =====================
@@ -169,7 +172,96 @@ export default function Home() {
   // 保存记录
   // =====================
 
+  // =====================
+  // AI 自动总结
+  // =====================
 
+  async function generateAISummary() {
+
+    if (!todayTask) {
+      return;
+    }
+
+    const record =
+      records[todayTask.day] || {};
+
+    const learningNote =
+      record.learning_note || "";
+
+    const resultNote =
+      record.result_note || "";
+
+    if (!learningNote && !resultNote) {
+
+      alert(
+        "请先填写学习心得或成果输出"
+      );
+
+      return;
+    }
+
+    setAiLoading(true);
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/ai-summary",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+
+              learning_note:
+                learningNote,
+
+              result_note:
+                resultNote
+
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          "AI总结失败"
+        );
+
+      }
+
+      setAiSummary(
+        data.summary || ""
+      );
+
+    } catch (error) {
+
+      console.error(
+        "AI总结失败:",
+        error
+      );
+
+      alert(
+        "AI总结失败：" +
+        error.message
+      );
+
+    } finally {
+
+      setAiLoading(false);
+
+    }
+
+  }
   async function saveRecord(
   day,
   status,
@@ -963,7 +1055,45 @@ boxSizing:"border-box"
 
 
           </button>
+<button
+  onClick={generateAISummary}
+  disabled={aiLoading}
+  style={{
+    marginTop: "12px",
+    width: "100%",
+    padding: "12px",
+    borderRadius: "10px",
+    border: "1px solid #111827",
+    background: "white",
+    color: "#111827",
+    fontSize: "15px",
+    cursor: "pointer"
+  }}
+>
+  {aiLoading
+    ? "🤖 AI正在总结..."
+    : "🤖 AI自动总结"}
+</button>
 
+{aiSummary && (
+  <div
+    style={{
+      marginTop: "15px",
+      background: "#f3f4f6",
+      padding: "15px",
+      borderRadius: "12px",
+      lineHeight: "1.7"
+    }}
+  >
+    <h4 style={{ marginTop: 0 }}>
+      AI学习总结
+    </h4>
+
+    <div>
+      {aiSummary}
+    </div>
+  </div>
+)}
 
 
         </div>
