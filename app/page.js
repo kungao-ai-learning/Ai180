@@ -36,6 +36,9 @@ export default function Home() {
 
   const [aiLoading, setAiLoading] = useState(false);
 
+  const [growthReport, setGrowthReport] = useState("");
+
+const [reportLoading, setReportLoading] = useState(false);
 
   // =====================
   // 获取数据
@@ -200,6 +203,57 @@ export default function Home() {
       return;
     }
 
+async function generateGrowthReport(){
+
+  setReportLoading(true);
+
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/growth-report",
+        {
+          method:"POST"
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "生成失败"
+      );
+
+    }
+
+
+    setGrowthReport(
+      data.report || ""
+    );
+
+
+  }catch(error){
+
+    alert(
+      "生成失败：" +
+      error.message
+    );
+
+
+  }finally{
+
+    setReportLoading(false);
+
+  }
+
+}
+    
     setAiLoading(true);
 
     try {
