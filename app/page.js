@@ -640,14 +640,7 @@ records:records
 
 }
 );
-          {
-
-            method:
-              "POST"
-
-          }
-
-        );
+          
 
 
       const data =
