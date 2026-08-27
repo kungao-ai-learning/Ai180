@@ -332,9 +332,7 @@ const remainingDays =
   180 - completedCount;
 
 
-const currentPhase =
-  todayTask?.phase ||
-  "AI能力建立";
+
 
 
 
@@ -354,7 +352,9 @@ const currentPhase =
     ||
     tasks[0];
 
-
+const currentPhase =
+  todayTask?.phase ||
+  "AI能力建立";
 
 
   if(loading){
