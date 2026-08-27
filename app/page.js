@@ -321,11 +321,20 @@ export default function Home() {
 
 
   const progressPercent =
-    Math.round(
-      completedCount /
-      180 *
-      100
-    );
+  Math.round(
+    completedCount /
+    180 *
+    100
+  );
+
+
+const remainingDays =
+  180 - completedCount;
+
+
+const currentPhase =
+  todayTask?.phase ||
+  "AI能力建立";
 
 
 
@@ -402,27 +411,150 @@ export default function Home() {
 
       {/* 数据面板 */}
 
-      <div
-
-        style={{
-          background:"#111827",
-          color:"white",
-          padding:"22px",
-          borderRadius:"16px",
-          marginTop:"20px"
-        }}
-
-      >
+<div
+style={{
+display:"grid",
+gridTemplateColumns:
+"repeat(2,1fr)",
+gap:"12px",
+marginTop:"20px"
+}}
+>
 
 
-        <div
-          style={{
-            opacity:.7,
-            fontSize:"14px"
-          }}
-        >
-          当前进度
-        </div>
+<div
+style={{
+background:"#111827",
+color:"white",
+padding:"18px",
+borderRadius:"16px"
+}}
+>
+
+<div
+style={{
+opacity:.7,
+fontSize:"13px"
+}}
+>
+🔥 连续学习
+</div>
+
+
+<div
+style={{
+fontSize:"28px",
+fontWeight:"700"
+}}
+>
+{completedCount}
+天
+</div>
+
+</div>
+
+
+
+
+
+<div
+style={{
+background:"white",
+padding:"18px",
+borderRadius:"16px"
+}}
+>
+
+<div
+style={{
+color:"#666",
+fontSize:"13px"
+}}
+>
+📚 完成进度
+</div>
+
+
+<div
+style={{
+fontSize:"28px",
+fontWeight:"700"
+}}
+>
+{completedCount}/180
+</div>
+
+</div>
+
+
+
+
+
+<div
+style={{
+background:"white",
+padding:"18px",
+borderRadius:"16px"
+}}
+>
+
+<div
+style={{
+color:"#666",
+fontSize:"13px"
+}}
+>
+📈 完成率
+</div>
+
+
+<div
+style={{
+fontSize:"28px",
+fontWeight:"700"
+}}
+>
+{progressPercent}%
+</div>
+
+</div>
+
+
+
+
+
+<div
+style={{
+background:"white",
+padding:"18px",
+borderRadius:"16px"
+}}
+>
+
+<div
+style={{
+color:"#666",
+fontSize:"13px"
+}}
+>
+⏳ 剩余
+</div>
+
+
+<div
+style={{
+fontSize:"28px",
+fontWeight:"700"
+}}
+>
+{remainingDays}
+天
+</div>
+
+</div>
+
+
+</div>
 
 
 
@@ -524,6 +656,17 @@ export default function Home() {
 
           </h3>
 
+            <div
+style={{
+background:"#f3f4f6",
+padding:"10px",
+borderRadius:"10px",
+marginBottom:"12px"
+}}
+>
+当前阶段：
+{currentPhase}
+</div>
 
 
 
