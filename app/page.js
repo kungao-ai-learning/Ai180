@@ -171,10 +171,11 @@ export default function Home() {
 
 
   async function saveRecord(
-    day,
-    status,
-    note
-  ){
+  day,
+  status,
+  learning_note,
+  result_note
+){
 
 
     setSavingDay(day);
@@ -197,10 +198,10 @@ export default function Home() {
         status:status,
 
         learning_note:
-          note || "",
+  learning_note || "",
 
-        result_note:
-          "",
+result_note:
+  result_note || "",
 
         updated_at:
           new Date()
@@ -718,7 +719,53 @@ marginBottom:"12px"
               ||
               ""
             }
+<textarea
 
+value={
+records[todayTask.day]
+?.result_note
+||
+""
+}
+
+onChange={
+(e)=>
+setRecords(
+old=>({
+...old,
+[todayTask.day]:{
+...(old[todayTask.day]||{}),
+day:todayTask.day,
+status:
+old[todayTask.day]?.status ||
+"in_progress",
+result_note:e.target.value
+}
+})
+)
+}
+
+placeholder="记录今天的成果输出、作品、代码、总结..."
+
+style={{
+
+width:"100%",
+
+minHeight:"90px",
+
+marginTop:"12px",
+
+padding:"12px",
+
+borderRadius:"10px",
+
+border:"1px solid #ddd",
+
+boxSizing:"border-box"
+
+}}
+
+/>
 
             onChange={
               (e)=>
@@ -772,25 +819,31 @@ marginBottom:"12px"
 
               saveRecord(
 
-                todayTask.day,
+  todayTask.day,
 
-                currentStatus === "completed"
+  currentStatus === "completed"
 
-                ?
+  ?
 
-                "in_progress"
+  "in_progress"
 
-                :
+  :
 
-                "completed",
+  "completed",
 
 
-                records[todayTask.day]
-                ?.learning_note
-                ||
-                ""
+  records[todayTask.day]
+  ?.learning_note
+  ||
+  "",
 
-              );
+
+  records[todayTask.day]
+  ?.result_note
+  ||
+  ""
+
+);
 
 
             }}
