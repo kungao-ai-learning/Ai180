@@ -753,6 +753,66 @@ marginBottom:"12px"
             }}
 
           />
+            <textarea
+
+value={
+  records[todayTask.day]
+  ?.result_note
+  ||
+  ""
+}
+
+onChange={
+  (e)=>
+  setRecords(
+    old=>({
+
+      ...old,
+
+      [todayTask.day]:{
+
+        ...(old[todayTask.day] || {}),
+
+        day:
+        todayTask.day,
+
+        status:
+        old[todayTask.day]?.status
+        ||
+        "in_progress",
+
+        result_note:
+        e.target.value
+
+      }
+
+    })
+  )
+}
+
+placeholder="记录今天的成果输出，例如：完成了什么作品、解决了什么问题、形成了什么经验..."
+
+style={{
+
+width:"100%",
+
+minHeight:"110px",
+
+marginTop:"15px",
+
+padding:"12px",
+
+borderRadius:"10px",
+
+border:"1px solid #ddd",
+
+boxSizing:"border-box",
+
+fontSize:"14px"
+
+}}
+
+/>
 <textarea
 
 value={
