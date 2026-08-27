@@ -1205,88 +1205,158 @@ boxSizing:"border-box"
 
 
       {
+  showHistory &&
 
-        showHistory &&
+  tasks.map(
 
+    task => (
 
-        tasks.map(
+      <div
 
-          task => (
+        key={task.day}
 
+        style={{
 
-            <div
+          background:"white",
 
+          marginTop:"12px",
 
-              key={task.day}
+          padding:"18px",
 
+          borderRadius:"14px",
 
-              style={{
+          lineHeight:"1.7"
 
-                background:"white",
+        }}
 
-                marginTop:"10px",
+      >
 
-                padding:"15px",
+        <h3
+          style={{
+            marginTop:0
+          }}
+        >
+          Day {task.day}
+          {" · "}
+          {task.title}
 
-                borderRadius:"12px",
+          {
+            records[task.day]
+            ?.status === "completed"
+            &&
+            " ✓"
+          }
 
-                display:"flex",
-
-                justifyContent:"space-between"
-
-              }}
-
-
-            >
-
-
-              <span>
-
-                Day {task.day}
-
-                {" · "}
-
-                {task.title}
-
-
-              </span>
+        </h3>
 
 
+        <div>
+
+          <b>
+          阶段：
+          </b>
+
+          {
+            task.phase ||
+            "AI学习"
+          }
+
+        </div>
 
 
-              <span>
+
+        <div
+          style={{
+            marginTop:"10px"
+          }}
+        >
+
+          <b>
+          学习心得：
+          </b>
 
 
-              {
+          <br/>
 
-                records[task.day]
-                ?.status === "completed"
+          {
+            records[task.day]
+            ?.learning_note
+            ||
+            "暂无记录"
+          }
 
-                ?
-
-                "✓"
-
-                :
-
-                ""
-
-              }
+        </div>
 
 
-              </span>
 
 
-            </div>
+        <div
+          style={{
+            marginTop:"10px"
+          }}
+        >
+
+          <b>
+          成果输出：
+          </b>
 
 
-          )
+          <br/>
+
+          {
+            records[task.day]
+            ?.result_note
+            ||
+            "暂无记录"
+          }
+
+        </div>
 
 
-        )
 
 
-      }
+        <div
+          style={{
 
+            marginTop:"10px",
+
+            background:"#f3f4f6",
+
+            padding:"12px",
+
+            borderRadius:"10px"
+
+          }}
+
+        >
+
+          <b>
+          AI总结：
+          </b>
+
+
+          <br/>
+
+
+          {
+            records[task.day]
+            ?.ai_summary
+            ||
+            "暂无AI总结"
+          }
+
+
+        </div>
+
+
+      </div>
+
+
+    )
+
+
+  )
+}
 
 
 
