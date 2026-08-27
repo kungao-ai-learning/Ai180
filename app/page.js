@@ -719,6 +719,40 @@ marginBottom:"12px"
               ||
               ""
             }
+
+
+            onChange={
+              (e)=>
+              updateNote(
+                todayTask.day,
+                e.target.value
+              )
+            }
+
+
+            placeholder="记录今天的学习心得、问题、收获..."
+
+            style={{
+
+              width:"100%",
+
+              minHeight:"110px",
+
+              marginTop:"15px",
+
+              padding:"12px",
+
+              borderRadius:"10px",
+
+              border:"1px solid #ddd",
+
+              boxSizing:"border-box",
+
+              fontSize:"14px"
+
+            }}
+
+          />
 <textarea
 
 value={
@@ -766,40 +800,6 @@ boxSizing:"border-box"
 }}
 
 />
-
-            onChange={
-              (e)=>
-              updateNote(
-                todayTask.day,
-                e.target.value
-              )
-            }
-
-
-            placeholder="记录今天的学习心得、问题、收获..."
-
-            style={{
-
-              width:"100%",
-
-              minHeight:"110px",
-
-              marginTop:"15px",
-
-              padding:"12px",
-
-              borderRadius:"10px",
-
-              border:"1px solid #ddd",
-
-              boxSizing:"border-box",
-
-              fontSize:"14px"
-
-            }}
-
-          />
-
 
 
 
