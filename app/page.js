@@ -202,57 +202,124 @@ const [reportLoading, setReportLoading] = useState(false);
 
       return;
     }
+}
 
-async function generateGrowthReport(){
+<div
+style={{
+background:"white",
+marginTop:"20px",
+padding:"20px",
+borderRadius:"16px"
+}}
+>
 
-  setReportLoading(true);
-
-
-  try{
-
-    const response =
-      await fetch(
-        "/api/growth-report",
-        {
-          method:"POST"
-        }
-      );
-
-
-    const data =
-      await response.json();
+<h3>
+📄 AI成长报告
+</h3>
 
 
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        "生成失败"
-      );
-
-    }
-
-
-    setGrowthReport(
-      data.report || ""
-    );
+<p
+style={{
+color:"#666",
+lineHeight:"1.6"
+}}
+>
+生成你的180天AI能力成长总结，
+用于作品展示和职业转型规划。
+</p >
 
 
-  }catch(error){
 
-    alert(
-      "生成失败：" +
-      error.message
-    );
+<button
+
+onClick={
+generateGrowthReport
+}
+
+disabled={
+reportLoading
+}
 
 
-  }finally{
+style={{
 
-    setReportLoading(false);
+width:"100%",
 
-  }
+padding:"12px",
+
+borderRadius:"10px",
+
+border:"none",
+
+background:"#111827",
+
+color:"white",
+
+fontSize:"15px"
+
+}}
+
+>
+
+{
+
+reportLoading
+
+?
+
+"🤖 AI正在生成报告..."
+
+:
+
+"📄 生成我的AI成长报告"
 
 }
+
+
+</button>
+
+
+
+{
+growthReport &&
+
+<div
+
+style={{
+
+marginTop:"15px",
+
+background:"#f3f4f6",
+
+padding:"15px",
+
+borderRadius:"12px",
+
+lineHeight:"1.8"
+
+}}
+
+>
+
+<h4>
+我的AI成长报告
+</h4>
+
+
+<div>
+
+{growthReport}
+
+</div>
+
+
+</div>
+
+}
+
+
+
+</div>
     
     setAiLoading(true);
 
@@ -1309,59 +1376,123 @@ boxSizing:"border-box"
       }
 
 
-async function generateGrowthReport(){
 
-  setReportLoading(true);
+<div
+style={{
+background:"white",
+marginTop:"20px",
+padding:"20px",
+borderRadius:"16px"
+}}
+>
 
-
-  try{
-
-    const response =
-      await fetch(
-        "/api/growth-report",
-        {
-          method:"POST"
-        }
-      );
-
-
-    const data =
-      await response.json();
+<h3>
+📄 AI成长报告
+</h3>
 
 
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        "生成失败"
-      );
-
-    }
-
-
-    setGrowthReport(
-      data.report || ""
-    );
+<p
+style={{
+color:"#666",
+lineHeight:"1.6"
+}}
+>
+生成你的180天AI能力成长总结，
+用于作品展示和职业转型规划。
+</p >
 
 
-  }catch(error){
 
-    alert(
-      "生成失败：" +
-      error.message
-    );
+<button
+
+onClick={
+generateGrowthReport
+}
+
+disabled={
+reportLoading
+}
 
 
-  }finally{
+style={{
 
-    setReportLoading(false);
+width:"100%",
 
-  }
+padding:"12px",
+
+borderRadius:"10px",
+
+border:"none",
+
+background:"#111827",
+
+color:"white",
+
+fontSize:"15px"
+
+}}
+
+>
+
+{
+
+reportLoading
+
+?
+
+"🤖 AI正在生成报告..."
+
+:
+
+"📄 生成我的AI成长报告"
+
+}
+
+
+</button>
+
+
+
+{
+growthReport &&
+
+<div
+
+style={{
+
+marginTop:"15px",
+
+background:"#f3f4f6",
+
+padding:"15px",
+
+borderRadius:"12px",
+
+lineHeight:"1.8"
+
+}}
+
+>
+
+<h4>
+我的AI成长报告
+</h4>
+
+
+<div>
+
+{growthReport}
+
+</div>
+
+
+</div>
 
 }
 
 
 
+</div>
 
       {/* 历史记录 */}
 
